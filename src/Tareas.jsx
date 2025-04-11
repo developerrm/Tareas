@@ -15,7 +15,7 @@ const PostItTasks = (props) => {
   // Estado para el Post-it que está siendo editado (asignación)
   const [editingTaskId, setEditingTaskId] = useState(null);
   // Estado para el nombre del asignado que se está editando
-  const [assigneeName, setAssigneeName] = useState("");
+  const [assigneeName, setAssigneeName] = useState(dataUser);
   const [valorAssignee, setValorAssignee] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -25,6 +25,7 @@ const PostItTasks = (props) => {
       await updateDoc(docRef, updatedData);
       console.log("Document updated successfully!");
       ObtenerTareas();
+      
     } catch (error) {
       console.error("Error updating document: ", error);
     }
@@ -32,13 +33,18 @@ const PostItTasks = (props) => {
 
   const ObtenerTareas = async () => {
     const querySnapshot = await getDocs(collection(db, "Tareas"));
-    const dataArray = querySnapshot.docs.map((doc) => ({
+    let dataArray = querySnapshot.docs.map((doc) => ({
       idRegister: doc.id,
       ...doc.data(),
     }));
-
-    console.log("Tareas desde Firebase:", dataArray);
+ // Filtrar los datos según el usuario
+ if (dataUser !== "ADMINISTRADOR") {
+  dataArray = dataArray.filter(
+      (task) => (!task.assignee && task.valorAssignee > 0) || (task.assignee === dataUser )
+  );
+}
     setTasks(dataArray);
+    setAssigneeName(dataUser);
   };
 
   // Cargar tareas desde localStorage al iniciar
@@ -52,6 +58,7 @@ const PostItTasks = (props) => {
     setIsAdmin(
       dataUser != null && dataUser.length > 0 && dataUser == "ADMINISTRADOR"
     );
+    
     console.log("UsuarioRegister", dataUser);
   }, [dataUser]);
 
@@ -59,7 +66,11 @@ const PostItTasks = (props) => {
   // useEffect(() => {
   //   localStorage.setItem("postItTasks", JSON.stringify(tasks));
   // }, [tasks]);
-
+const Salir = () => {
+  // Supongamos que quieres eliminar un registro con la clave "miRegistro"
+localStorage.removeItem('userName');
+window.location.reload();
+}
   // Función para agregar una nueva tarea
   const addTask = async (e) => {
     e.preventDefault();
@@ -98,22 +109,20 @@ const PostItTasks = (props) => {
   const startEditingAssignee = (taskId, currentAssignee) => {
     if (!currentAssignee) {
       setEditingTaskId(taskId);
-      setAssigneeName(currentAssignee || "");
+      setAssigneeName(currentAssignee);
     } else {
       setTasks(
         tasks.map((task) =>
           task.idRegister === taskId
             ? updateData(task.idRegister, {
                 ...task,
-                assignee: "",
-                valorAssignee: 0,
+                assignee: ""                
               })
             : task
         )
       );
 
       setEditingTaskId(null);
-      setAssigneeName("");
     }
   };
   // Función para iniciar la edición del Valor asignado
@@ -156,7 +165,6 @@ const PostItTasks = (props) => {
         )
       );
       setEditingTaskId(null);
-      setAssigneeName("");
     }
   };
   // Función para guardar el valor asignado
@@ -184,7 +192,6 @@ const PostItTasks = (props) => {
   // Función para cancelar la edición
   const cancelEditing = () => {
     setEditingTaskId(null);
-    setAssigneeName("");
   };
   // Función para cancelar la edición del valor
   const cancelValorEditing = () => {
@@ -193,7 +200,7 @@ const PostItTasks = (props) => {
   };
 
   return (
-    <div className="post-it-container">
+    <div className="post-it-container">      
       <h1 className="post-it-title">Mis Tareas</h1>
 
       {/* Formulario para agregar tareas */}
@@ -226,12 +233,12 @@ const PostItTasks = (props) => {
                 className={`post-it ${task.color}`}
                 style={{ transform: `rotate(${task.rotation}deg)` }}
               >
-                <button
+                {/* <button
                   className="delete-button"
                   onClick={() => deleteTask(task.idRegister)}
                 >
                   ×
-                </button>
+                </button> */}
 
                 <p className="post-it-text">{task.Descripcion}</p>
                 {task.valorAssignee > 0 && (
@@ -246,7 +253,7 @@ const PostItTasks = (props) => {
 
                 {/* Botón para asignar que aparece al hacer hover */}
                 {!isAdmin ? (
-                  editingTaskId !== task.idRegister && (
+                  editingTaskId !== task.idRegister && task.valorAssignee > 0 && (
                     <button
                       className="assign-button"
                       onClick={() =>
@@ -257,7 +264,8 @@ const PostItTasks = (props) => {
                     </button>
                   )
                 ) : (
-                  <button
+                  (!task.assignee?
+                  (<button
                     className="assign-button"
                     onClick={() =>
                       startEditingValorAssignee(
@@ -267,7 +275,7 @@ const PostItTasks = (props) => {
                     }
                   >
                     {task.valorAssignee ? "Quitar Valor" : "Asignar Valor"}
-                  </button>
+                  </button>):(""))
                 )}
                 {/* Formulario de edición que aparece cuando se está editando */}
                 {!isAdmin
@@ -331,6 +339,16 @@ const PostItTasks = (props) => {
             )
           )
         )}
+      </div>
+      <div className="footer">
+        <div className="footer-data"> 
+        <p className="post-it-text">Desarrollado por: Guillermo Maza</p>
+        <p className="post-it-text">Versión 1.0</p>
+        </div>
+        <div>
+        <button className="cancel-button" onClick={Salir}>Salir</button>
+        </div>
+
       </div>
     </div>
   );

@@ -4,6 +4,12 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    box-sizing: border-box;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   
   .post-it-title {
@@ -268,4 +274,8 @@
       max-width: 300px;
     }
   }
-  
+  .footer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
