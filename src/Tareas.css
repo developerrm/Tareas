@@ -1,0 +1,271 @@
+/* Estilos generales */
+.post-it-container {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .post-it-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+  }
+  
+  /* Formulario para agregar tareas */
+  .post-it-form {
+    display: flex;
+    margin-bottom: 30px;
+    gap: 10px;
+  }
+  
+  .post-it-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  .post-it-button {
+    background-color: #ffd43b;
+    color: #333;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .post-it-button:hover {
+    background-color: #fcc419;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Tablero de Post-its */
+  .post-it-board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  /* Estilos para las notas Post-it */
+  .post-it {
+    width: 200px;
+    min-height: 200px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+  
+  .post-it:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+  }
+  
+  /* Colores de Post-its */
+  .post-it.yellow {
+    background-color: #fff9c4;
+    border-bottom: 1px solid #ffd54f;
+  }
+  
+  .post-it.green {
+    background-color: #dcedc8;
+    border-bottom: 1px solid #aed581;
+  }
+  
+  .post-it.blue {
+    background-color: #bbdefb;
+    border-bottom: 1px solid #64b5f6;
+  }
+  
+  .post-it.pink {
+    background-color: #f8bbd0;
+    border-bottom: 1px solid #f48fb1;
+  }
+  
+  /* Texto dentro del Post-it */
+  .post-it-text {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 18px;
+    color: #333;
+    word-wrap: break-word;
+    text-align: center;
+    margin: 0;
+    line-height: 1.5;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Botón para eliminar */
+  .delete-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 20px;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+  }
+  
+  .delete-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #333;
+    opacity: 1;
+  }
+  
+  /* Mensaje cuando no hay tareas */
+  .no-tasks {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    padding: 40px 0;
+  }
+  
+  /* Efecto de cinta adhesiva en la parte superior */
+  .post-it::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    z-index: -1;
+  }
+  
+  /* Botón para asignar tarea (visible solo al hacer hover) */
+  .assign-button {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #333;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .post-it:hover .assign-button {
+    opacity: 1;
+  }
+  
+  .assign-button:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  
+  /* Formulario para asignar tarea */
+  .assignee-form {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 20;
+  }
+  
+  .assignee-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+  }
+  
+  .assignee-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+  }
+  
+  .save-button,
+  .cancel-button {
+    flex: 1;
+    padding: 5px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+  }
+  
+  .save-button {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .save-button:hover {
+    background-color: #388e3c;
+  }
+  
+  .cancel-button {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .cancel-button:hover {
+    background-color: #d32f2f;
+  }
+  
+  /* Etiqueta de asignado */
+  .assignee-badge {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #555;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .post-it-form {
+      flex-direction: column;
+    }
+  
+    .post-it {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+  

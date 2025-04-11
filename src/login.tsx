@@ -1,9 +1,9 @@
 "use client"
 import React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useNavigate } from "react"
 import "./login.css" // Importa el archivo CSS
 
-export default function LoginPage() {
+export default function LoginPage({eventHandlerUsuarioRegister}) {
   const [name, setName] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
 
@@ -11,8 +11,14 @@ export default function LoginPage() {
   useEffect(() => {
     const savedName = localStorage.getItem("userName")
     if (savedName) {
-      setName(savedName)
-      setIsSubmitted(true)
+      setName(savedName);
+      setIsSubmitted(true);       
+      const userInfo = {
+        isRegistered: true,
+        userName: savedName 
+      };
+        eventHandlerUsuarioRegister(userInfo);
+     
     }
   }, [])
 
@@ -30,6 +36,10 @@ export default function LoginPage() {
     setIsSubmitted(false)
   }
 
+  const recargarRuta = () => {
+    window.location.reload();
+
+  };
   return ( 
       <div className="card">
         <div className="text-center">
@@ -74,9 +84,14 @@ export default function LoginPage() {
         ) : (
           <div className="mt-6">
             <p className="mb-4 subtitle">Tu nombre ha sido guardado para esta sesión.</p>
+            <div className="groupButtons">
             <button onClick={handleReset} className="btn btn-secondary">
               Cambiar nombre
             </button>
+            <button onClick={recargarRuta} className="btn btn-primary">
+              Continuar
+            </button>
+              </div>
           </div>
         )}
       </div> 

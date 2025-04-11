@@ -129,4 +129,8 @@
   .mt-6 {
     margin-top: 1.5rem;
   }
-  
+  .groupButtons{
+    display: flex;
+    justify-content: space-between;
+    gap: 55px;
+  }
