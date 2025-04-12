@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import "./Tareas.css";
 import { db } from "../firebaseconfig.js"; // Asegúrate de importar tu configuración de Firebase correctamente
 import { collection, getDocs } from "firebase/firestore";
-import { doc, setDoc, updateDoc, addDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
 
 const PostItTasks = (props) => {
   const { dataUser } = props;
@@ -25,7 +25,6 @@ const PostItTasks = (props) => {
       await updateDoc(docRef, updatedData);
       console.log("Document updated successfully!");
       ObtenerTareas();
-      
     } catch (error) {
       console.error("Error updating document: ", error);
     }
@@ -37,12 +36,14 @@ const PostItTasks = (props) => {
       idRegister: doc.id,
       ...doc.data(),
     }));
- // Filtrar los datos según el usuario
- if (dataUser !== "ADMINISTRADOR") {
-  dataArray = dataArray.filter(
-      (task) => (!task.assignee && task.valorAssignee > 0) || (task.assignee === dataUser )
-  );
-}
+    // Filtrar los datos según el usuario
+    if (dataUser !== "ADMINISTRADOR") {
+      dataArray = dataArray.filter(
+        (task) =>
+          (!task.assignee && task.valorAssignee > 0) ||
+          task.assignee === dataUser
+      );
+    }
     setTasks(dataArray);
     setAssigneeName(dataUser);
   };
@@ -58,7 +59,7 @@ const PostItTasks = (props) => {
     setIsAdmin(
       dataUser != null && dataUser.length > 0 && dataUser == "ADMINISTRADOR"
     );
-    
+
     console.log("UsuarioRegister", dataUser);
   }, [dataUser]);
 
@@ -66,11 +67,11 @@ const PostItTasks = (props) => {
   // useEffect(() => {
   //   localStorage.setItem("postItTasks", JSON.stringify(tasks));
   // }, [tasks]);
-const Salir = () => {
-  // Supongamos que quieres eliminar un registro con la clave "miRegistro"
-localStorage.removeItem('userName');
-window.location.reload();
-}
+  const Salir = () => {
+    // Supongamos que quieres eliminar un registro con la clave "miRegistro"
+    localStorage.removeItem("userName");
+    window.location.reload();
+  };
   // Función para agregar una nueva tarea
   const addTask = async (e) => {
     e.preventDefault();
@@ -91,18 +92,23 @@ window.location.reload();
     };
     try {
       await addDoc(collection(db, "Tareas"), newTaskObj);
-      alert("Tarea agregado con éxito");
+      console.error("Tarea agregado con éxito");
     } catch (e) {
       console.error("Error al agregar documento: ", e);
     }
-
-    setTasks([...tasks, newTaskObj]);
+    ObtenerTareas();
     setNewTask("");
   };
 
   // Función para eliminar una tarea
-  const deleteTask = (taskId) => {
-    setTasks(tasks.filter((task) => task.id !== taskId));
+  const deleteTask = async (taskId) => {
+    setTasks(tasks.filter((task) => task.idRegister !== taskId));
+    try {
+      await deleteDoc(doc(db, "Tareas", taskId));
+      console.error("Tarea eliminada con éxito");
+    } catch (error) {
+      console.error("Error al eliminar la tarea:", error);
+    }
   };
 
   // Función para iniciar la edición del asignado
@@ -116,7 +122,7 @@ window.location.reload();
           task.idRegister === taskId
             ? updateData(task.idRegister, {
                 ...task,
-                assignee: ""                
+                assignee: "",
               })
             : task
         )
@@ -200,7 +206,7 @@ window.location.reload();
   };
 
   return (
-    <div className="post-it-container">      
+    <div className="post-it-container">
       <h1 className="post-it-title">Mis Tareas</h1>
 
       {/* Formulario para agregar tareas */}
@@ -233,13 +239,16 @@ window.location.reload();
                 className={`post-it ${task.color}`}
                 style={{ transform: `rotate(${task.rotation}deg)` }}
               >
-                {/* <button
-                  className="delete-button"
-                  onClick={() => deleteTask(task.idRegister)}
-                >
-                  ×
-                </button> */}
-
+                {isAdmin && !task.assignee ? (
+                  <button
+                    className="delete-button"
+                    onClick={() => deleteTask(task.idRegister)}
+                  >
+                    ×
+                  </button>
+                ) : (
+                  ""
+                )}
                 <p className="post-it-text">{task.Descripcion}</p>
                 {task.valorAssignee > 0 && (
                   <p className="post-it-text">Valor ${task.valorAssignee}</p>
@@ -253,7 +262,8 @@ window.location.reload();
 
                 {/* Botón para asignar que aparece al hacer hover */}
                 {!isAdmin ? (
-                  editingTaskId !== task.idRegister && task.valorAssignee > 0 && (
+                  editingTaskId !== task.idRegister &&
+                  task.valorAssignee > 0 && (
                     <button
                       className="assign-button"
                       onClick={() =>
@@ -263,9 +273,8 @@ window.location.reload();
                       {task.assignee ? "Rechazar" : "Aceptar tarea"}
                     </button>
                   )
-                ) : (
-                  (!task.assignee?
-                  (<button
+                ) : !task.assignee ? (
+                  <button
                     className="assign-button"
                     onClick={() =>
                       startEditingValorAssignee(
@@ -275,7 +284,9 @@ window.location.reload();
                     }
                   >
                     {task.valorAssignee ? "Quitar Valor" : "Asignar Valor"}
-                  </button>):(""))
+                  </button>
+                ) : (
+                  ""
                 )}
                 {/* Formulario de edición que aparece cuando se está editando */}
                 {!isAdmin
@@ -341,14 +352,15 @@ window.location.reload();
         )}
       </div>
       <div className="footer">
-        <div className="footer-data"> 
-        <p className="post-it-text">Desarrollado por: Guillermo Maza</p>
-        <p className="post-it-text">Versión 1.0</p>
+        <div className="footer-data">
+          <p className="post-it-text">Desarrollado por: Guillermo Maza</p>
+          <p className="post-it-text">Versión 1.0</p>
         </div>
         <div>
-        <button className="cancel-button" onClick={Salir}>Salir</button>
+          <button className="cancel-button" onClick={Salir}>
+            Salir
+          </button>
         </div>
-
       </div>
     </div>
   );
